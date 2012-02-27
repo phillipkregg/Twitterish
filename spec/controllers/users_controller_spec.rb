@@ -132,7 +132,7 @@ render_views
     
     it "should have the right title" do
       get :edit, :id => @user
-      response.should have_selector('title', "Edit user")
+      response.should have_selector('title', :content => "Edit user")
     end
     
     it "should have a link to change gravatar" do
@@ -164,7 +164,7 @@ render_views
       
       it "should have the right title" do
         put :update, :id => @user, :user => @attr
-        response.should have_selector("title", :content => "Edit user")
+        response.should have_selector('title', :content => 'Edit user')
       end
       
     end
@@ -175,26 +175,42 @@ render_views
                                                       :password_confirmation => "123456"}                         
       end
       
-      it "should change user attributes" do
+       it "should change the user's attributes" do
         put :update, :id => @user, :user => @attr
-        user = assigns(:user)
         @user.reload
-        @user.name.should == user.name
-        @user.email.should == user.email_on_error
-        @user.encrypted_password.should == user.encrypted_password
+        @user.name.should  == @attr[:name]
+        @user.email.should == @attr[:email]
+        @user.encrypted_password.should == assigns(:user).encrypted_password
       end
       
       it "should have a flash message" do
         put :update, :id => @user, :user => @attr
         flash[:success].should =~ /updated/i
       end
-      
-      
-      
+                  
     end
     
   end
  
+ 
+ 
+  describe "authentication of edit/update" do
+    
+    before(:each) do
+      @user = Factory(:user)
+    end
+    
+    it "should deny access of 'edit'" do
+      get :edit, :id => @user
+      response.should redirect_to(signin_path)
+      flash[:notice].should =~ /sign in/i
+    end
+    
+    it "should deny access to 'update'" do
+      put :update, :id => @user, :user => {}
+      response.should redirect_to(signin_path)
+    end
+  end
   
   
 
