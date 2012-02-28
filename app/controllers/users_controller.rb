@@ -1,5 +1,11 @@
 class UsersController < ApplicationController
-  before_filter :authenticate, :only => [:edit, :update]
+  
+  before_filter :authenticate, :only => [:index, :edit, :update]
+  
+  def index
+    @title = "All users"
+    @users = User.paginate(:page => params[:page])
+  end  
     
   def show
     @user = User.find(params[:id])
@@ -22,7 +28,7 @@ class UsersController < ApplicationController
     end    
   end
   
-  def edit
+  def edit    
     @user = User.find(params[:id])
     @title = "Edit user"
   end
@@ -47,9 +53,7 @@ class UsersController < ApplicationController
       
     end
     
-    def deny_access
-      redirect_to signin_path, :notice => "Please sign in to access this page."
-    end
+  
     
 
 end 
